@@ -1,22 +1,17 @@
 
-"use client";
+"use cache";
 
-import { useEffect, useState } from "react";
-
-export default function Footer() {
-  const [year, setYear] = useState<number | null>(null);
-
-  useEffect(() => {
-    setYear(new Date().getFullYear());
-  }, []);
+export default async function Footer() {
+  const year = new Date().getFullYear();
 
   return (
     <footer className="border-t py-6">
-      <div className="mx-auto max-w-5xl px-4 text-center">
-        <p>
-          Copyright &copy; {year ?? "2026"} | Armando Fernandez | All rights reserved
+      <div className="mx-auto w-full max-w-7xl px-6">
+        <p className="text-center">
+          Copyright &copy; {year} | My Portfolio | All rights reserved.
         </p>
       </div>
     </footer>
   );
 }
+

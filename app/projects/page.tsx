@@ -1,7 +1,9 @@
 import { Suspense } from "react";
+import Link from "next/link";
 import { getPaginatedProjects } from "@/lib/projects-db";
 import ProjectSearch from "@/components/ProjectSearch";
 import Pagination from "@/components/Pagination";
+import ProjectCard from "@/components/ProjectCard";
 
 interface ProjectsPageProps {
   searchParams: Promise<{
@@ -33,34 +35,7 @@ async function ProjectsContent({
         ) : (
           <div className="grid gap-6 md:grid-cols-2">
             {result.projects.map((project) => (
-              <article
-                key={project.id}
-                className="rounded-lg bg-white p-6 shadow"
-              >
-                <h2 className="text-2xl font-semibold text-gray-900">
-                  {project.title}
-                </h2>
-
-                <p className="mt-2 text-gray-600">
-                  {project.description}
-                </p>
-
-                <p className="mt-3 text-sm">
-                  <strong>Technologies:</strong>{" "}
-                  {project.technologies.join(", ")}
-                </p>
-
-                {project.link && (
-                  <a
-                    href={project.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-4 inline-block text-blue-600 hover:underline"
-                  >
-                    View Project
-                  </a>
-                )}
-              </article>
+              <ProjectCard key={project.id} project={project} />
             ))}
           </div>
         )}
@@ -79,7 +54,15 @@ export default function ProjectsPage({
 }: ProjectsPageProps) {
   return (
     <main className="mx-auto max-w-5xl px-4 py-12">
-      <h1 className="text-gray-900">Projects Overview</h1>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <h1 className="text-gray-100">Projects Overview</h1>
+        <Link
+          href="/projects/create"
+          className="rounded-md bg-blue-700 px-5 py-2 font-medium text-white hover:bg-blue-800"
+        >
+          + Create Project
+        </Link>
+      </div>
 
       <Suspense fallback={<p>Loading projects...</p>}>
         <ProjectsContent searchParams={searchParams} />
@@ -87,4 +70,3 @@ export default function ProjectsPage({
     </main>
   );
 }
-

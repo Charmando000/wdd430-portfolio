@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -22,7 +23,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-gray-100 text-gray-900`}>
-        <Header />
+        <Suspense fallback={<div className="h-[68px] bg-slate-800" aria-hidden="true" />}>
+          <Header />
+        </Suspense>
         {children}
         <Footer />
       </body>

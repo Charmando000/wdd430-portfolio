@@ -88,3 +88,47 @@ export async function getProjectById(
 
   return (rows[0] as Project | undefined) ?? null;
 }
+
+export interface ProjectInput {
+  title: string;
+  description: string;
+  type: "opensource" | "school";
+  technologies: string[];
+  link: string;
+}
+
+export async function insertProject(project: ProjectInput): Promise<void> {
+  await sql`
+    INSERT INTO projects (title, description, type, technologies, link)
+    VALUES (
+      ${project.title},
+      ${project.description},
+      ${project.type},
+      ${project.technologies},
+      ${project.link || null}
+    )
+  `;
+}
+
+export async function updateProjectRecord(
+  id: number,
+  project: ProjectInput
+): Promise<void> {
+  await sql`
+    UPDATE projects
+    SET
+      title = ${project.title},
+      description = ${project.description},
+      type = ${project.type},
+      technologies = ${project.technologies},
+      link = ${project.link || null}
+    WHERE id = ${id}
+  `;
+}
+
+export async function deleteProjectRecord(id: number): Promise<void> {
+  await sql`
+    DELETE FROM projects
+    WHERE id = ${id}
+  `;
+}

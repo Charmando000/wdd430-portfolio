@@ -1,4 +1,3 @@
-
 import { neon } from "@neondatabase/serverless";
 
 export interface Project {
@@ -8,30 +7,20 @@ export interface Project {
   type: "opensource" | "school";
   technologies: string[];
   link?: string;
+  year_completed?: number | null;
 }
 
 const sql = neon(process.env.POSTGRES_URL!);
 
-export async function getProjects(
-  type?: string | null
-): Promise<Project[]> {
+export async function getProjects(type?: string | null): Promise<Project[]> {
   if (type) {
     const rows = await sql`
-      SELECT *
-      FROM projects
-      WHERE type = ${type}
-      ORDER BY id
+      SELECT * FROM projects WHERE type = ${type} ORDER BY id
     `;
-
     return rows as Project[];
   }
 
-  const rows = await sql`
-    SELECT *
-    FROM projects
-    ORDER BY id
-  `;
-
+  const rows = await sql`SELECT * FROM projects ORDER BY id`;
   return rows as Project[];
 }
 
@@ -42,13 +31,10 @@ export async function getPaginatedProjects(
 ) {
   const safePage = Math.max(1, Math.floor(page));
   const offset = (safePage - 1) * pageSize;
-  const searchPattern = search.trim()
-    ? `%${search.trim()}%`
-    : "%";
+  const searchPattern = search.trim() ? `%${search.trim()}%` : "%";
 
   const projects = await sql`
-    SELECT *
-    FROM projects
+    SELECT * FROM projects
     WHERE
       title ILIKE ${searchPattern}
       OR COALESCE(description, '') ILIKE ${searchPattern}
@@ -59,8 +45,7 @@ export async function getPaginatedProjects(
   `;
 
   const countResult = await sql`
-    SELECT COUNT(*) AS total
-    FROM projects
+    SELECT COUNT(*) AS total FROM projects
     WHERE
       title ILIKE ${searchPattern}
       OR COALESCE(description, '') ILIKE ${searchPattern}
@@ -68,7 +53,6 @@ export async function getPaginatedProjects(
   `;
 
   const total = Number(countResult[0].total);
-
   return {
     projects: projects as Project[],
     total,
@@ -77,15 +61,8 @@ export async function getPaginatedProjects(
   };
 }
 
-export async function getProjectById(
-  id: number
-): Promise<Project | null> {
-  const rows = await sql`
-    SELECT *
-    FROM projects
-    WHERE id = ${id}
-  `;
-
+export async function getProjectById(id: number): Promise<Project | null> {
+  const rows = await sql`SELECT * FROM projects WHERE id = ${id}`;
   return (rows[0] as Project | undefined) ?? null;
 }
 
@@ -95,25 +72,24 @@ export interface ProjectInput {
   type: "opensource" | "school";
   technologies: string[];
   link: string;
+  yearCompleted?: number;
 }
 
 export async function insertProject(project: ProjectInput): Promise<void> {
   await sql`
-    INSERT INTO projects (title, description, type, technologies, link)
+    INSERT INTO projects (title, description, type, technologies, link, year_completed)
     VALUES (
       ${project.title},
       ${project.description},
       ${project.type},
       ${project.technologies},
-      ${project.link || null}
+      ${project.link || null},
+      ${project.yearCompleted ?? null}
     )
   `;
 }
 
-export async function updateProjectRecord(
-  id: number,
-  project: ProjectInput
-): Promise<void> {
+export async function updateProjectRecord(id: number, project: ProjectInput): Promise<void> {
   await sql`
     UPDATE projects
     SET
@@ -121,14 +97,12 @@ export async function updateProjectRecord(
       description = ${project.description},
       type = ${project.type},
       technologies = ${project.technologies},
-      link = ${project.link || null}
+      link = ${project.link || null},
+      year_completed = ${project.yearCompleted ?? null}
     WHERE id = ${id}
   `;
 }
 
 export async function deleteProjectRecord(id: number): Promise<void> {
-  await sql`
-    DELETE FROM projects
-    WHERE id = ${id}
-  `;
+  await sql`DELETE FROM projects WHERE id = ${id}`;
 }

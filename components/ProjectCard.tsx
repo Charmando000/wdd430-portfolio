@@ -25,6 +25,12 @@ export default function ProjectCard(props: ProjectCardProps) {
     <article className="rounded-lg bg-white p-6 shadow">
       <h2 className="text-2xl font-semibold text-gray-900">{title}</h2>
 
+      {project?.year_completed && (
+        <p className="mt-1 text-sm text-gray-500">
+          <strong>Year completed:</strong> {project.year_completed}
+        </p>
+      )}
+
       <p className="mt-2 text-gray-600">{description}</p>
 
       <p className="mt-3 text-sm text-gray-700">

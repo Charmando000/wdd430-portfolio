@@ -26,6 +26,9 @@ function getProjectFormData(formData: FormData) {
       .map((technology) => technology.trim())
       .filter(Boolean),
     link: String(formData.get("link") ?? "").trim(),
+    yearCompleted: String(formData.get("yearCompleted") ?? "").trim()
+      ? Number(formData.get("yearCompleted"))
+      : undefined,
   };
 }
 
@@ -50,7 +53,15 @@ export async function createProject(
     };
   }
 
-  await insertProject(validatedFields.data);
+  try {
+    await insertProject(validatedFields.data);
+  } catch (error) {
+    console.error("Error creating project:", error);
+    return {
+      message: "Failed to create project. Please try again later.",
+    };
+  }
+
   revalidateProjectPages();
   redirect("/projects");
 }
@@ -75,7 +86,15 @@ export async function updateProject(
     };
   }
 
-  await updateProjectRecord(id, validatedFields.data);
+  try {
+    await updateProjectRecord(id, validatedFields.data);
+  } catch (error) {
+    console.error("Error updating project:", error);
+    return {
+      message: "Failed to update project. Please try again later.",
+    };
+  }
+
   revalidateProjectPages();
   redirect("/projects");
 }
@@ -87,6 +106,12 @@ export async function deleteProject(formData: FormData): Promise<void> {
     throw new Error("Invalid project ID.");
   }
 
-  await deleteProjectRecord(id);
+  try {
+    await deleteProjectRecord(id);
+  } catch (error) {
+    console.error("Error deleting project:", error);
+    throw new Error("Failed to delete project. Please try again later.");
+  }
+
   revalidateProjectPages();
 }
